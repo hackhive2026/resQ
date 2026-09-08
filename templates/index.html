@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>RapidAid — Report an accident</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+<!-- ============================================================ -->
+<!-- SCREEN: Landing                                               -->
+<!-- ============================================================ -->
+<section class="screen is-active" id="screen-landing" data-screen>
+  <div class="landing">
+    <div class="landing__mark">RapidAid</div>
+
+    <h1 class="landing__headline">Every second<br>counts.</h1>
+    <p class="landing__sub">
+      You saw it happen. In under a minute you can get help moving —
+      photos of the scene, the injured, and where you are, sent straight
+      to a response team.
+    </p>
+
+    <button class="btn btn--primary btn--xl" id="btn-start" type="button">
+      Report an accident
+    </button>
+
+    <ol class="steps">
+      <li class="steps__item">
+        <span class="steps__num">1</span>
+        <span class="steps__label">Photograph the scene</span>
+      </li>
+      <li class="steps__item">
+        <span class="steps__num">2</span>
+        <span class="steps__label">Photograph the injured</span>
+      </li>
+      <li class="steps__item">
+        <span class="steps__num">3</span>
+        <span class="steps__label">Share your location</span>
+      </li>
+      <li class="steps__item">
+        <span class="steps__num">4</span>
+        <span class="steps__label">Send to responders</span>
+      </li>
+    </ol>
+
+    <p class="landing__footnote">
+      Stay safe first. Only step in if the area is clear of ongoing traffic
+      or fire risk.
+    </p>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SCREEN: Capture (shared markup for scene + victim)            -->
+<!-- ============================================================ -->
+<section class="screen screen--dark" id="screen-capture" data-screen>
+  <header class="capture__header">
+    <div class="capture__progress" id="capture-progress" aria-hidden="true">
+      <span class="capture__progress-dot" data-step="1"></span>
+      <span class="capture__progress-dot" data-step="2"></span>
+      <span class="capture__progress-dot" data-step="3"></span>
+      <span class="capture__progress-dot" data-step="4"></span>
+    </div>
+    <h2 class="capture__title" id="capture-title">Photograph the scene</h2>
+    <p class="capture__hint" id="capture-hint">
+      Capture wide shots of the whole area — vehicles, road signs, skid marks.
+      Take as many as you need.
+    </p>
+  </header>
+
+  <!-- Live Camera Viewfinder -->
+  <div class="viewfinder">
+    <video id="video" class="viewfinder__video" autoplay playsinline muted></video>
+    <canvas id="canvas" hidden></canvas>
+
+    <!-- Initial / Permission overlay -->
+    <div class="viewfinder__overlay" id="camera-overlay">
+      <p>Camera access is needed to take photos.</p>
+      <button class="btn btn--primary" id="btn-allow-camera" type="button">Allow camera</button>
+    </div>
+
+    <!-- Error State -->
+    <div class="viewfinder__overlay" id="camera-error" hidden>
+      <p>Camera access failed or was denied.</p>
+      <button class="btn btn--primary" id="btn-retry-camera" type="button">Retry camera</button>
+    </div>
+  </div>
+
+  <div class="filmstrip" id="filmstrip" aria-label="Photos captured so far"></div>
+
+  <div class="capture__controls">
+    <button class="btn btn--ghost-light" id="btn-switch-camera" type="button" aria-label="Switch camera">
+      ⟲
+    </button>
+    <button class="shutter" id="btn-shutter" type="button" aria-label="Take photo"></button>
+    <button class="btn btn--primary" id="btn-capture-continue" type="button" disabled>
+      Continue
+    </button>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SCREEN: Location                                              -->
+<!-- ============================================================ -->
+<section class="screen" id="screen-location" data-screen>
+  <div class="panel">
+    <div class="panel__icon" aria-hidden="true">
+      <svg viewBox="0 0 48 48" width="48" height="48" fill="none">
+        <path d="M24 4C15.7 4 9 10.7 9 19c0 11.3 15 25 15 25s15-13.7 15-25c0-8.3-6.7-15-15-15z" stroke="var(--color-alert)" stroke-width="2.5" stroke-linejoin="round"/>
+        <circle cx="24" cy="19" r="5.5" stroke="var(--color-alert)" stroke-width="2.5"/>
+      </svg>
+    </div>
+    <h2 class="panel__title">Share your location</h2>
+    <p class="panel__body">
+      Responders need to know exactly where to go. Your coordinates are sent
+      once, along with this report — RapidAid doesn't track you afterward.
+    </p>
+
+    <div class="location__status" id="location-status" aria-live="polite"></div>
+
+    <button class="btn btn--primary btn--xl" id="btn-share-location" type="button">
+      Share location
+    </button>
+    <button class="btn btn--text" id="btn-location-continue" type="button" hidden>
+      Continue
+    </button>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SCREEN: Review + upload                                       -->
+<!-- ============================================================ -->
+<section class="screen" id="screen-review" data-screen>
+  <div class="panel panel--wide">
+    <h2 class="panel__title">Review before sending</h2>
+
+    <dl class="summary">
+      <div class="summary__row">
+        <dt>Scene photos</dt>
+        <dd id="summary-scene">0</dd>
+      </div>
+      <div class="summary__row">
+        <dt>Photos of the injured</dt>
+        <dd id="summary-victim">0</dd>
+      </div>
+      <div class="summary__row">
+        <dt>Location</dt>
+        <dd id="summary-location">Not shared</dd>
+      </div>
+    </dl>
+
+    <div class="upload-progress" id="upload-progress" hidden>
+      <div class="upload-progress__bar">
+        <div class="upload-progress__fill" id="upload-progress-fill"></div>
+      </div>
+      <p class="upload-progress__label" id="upload-progress-label">Uploading photo 1 of 6…</p>
+    </div>
+
+    <button class="btn btn--primary btn--xl" id="btn-send" type="button">
+      Send to responders
+    </button>
+    <button class="btn btn--text" id="btn-back-to-capture" type="button">
+      Add more photos
+    </button>
+  </div>
+</section>
+
+<!-- SCREEN: Success -->
+<section class="screen" id="screen-success" data-screen>
+  <div class="panel">
+    <div class="panel__icon panel__icon--success" aria-hidden="true">
+      <svg viewBox="0 0 48 48" width="48" height="48" fill="none">
+        <circle cx="24" cy="24" r="20" stroke="var(--color-confirm)" stroke-width="2.5"/>
+        <path d="M15 24.5l6 6 12-13" stroke="var(--color-confirm)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <h2 class="panel__title">Report sent</h2>
+    <p class="panel__body">
+      Case <strong id="case-id">—</strong> is now processed by the AI response team.
+    </p>
+
+    <!-- DYNAMIC AI VERDICT BANNER CONTAINER -->
+    <div id="ai-verdict-banner" style="margin-bottom: 24px; width: 100%;"></div>
+
+    <button class="btn btn--primary btn--xl" id="btn-new-report" type="button">
+      Report another accident
+    </button>
+  </div>
+</section>
+
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
