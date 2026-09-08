@@ -5,6 +5,9 @@
  *                -> review -> (upload) -> success
  */
 
+// Define your backend server URL here (e.g., your Render HTTPS URL or Ngrok tunnel)
+const API_BASE_URL = "https://resqser.onrender.com/";
+
 const state = {
   reportId: null,
   stream: null,
@@ -59,7 +62,7 @@ function toast(msg) {
 
 async function startSession() {
   try {
-    const res = await fetch("/api/session/start", { method: "POST" });
+    const res = await fetch(`${API_BASE_URL}/api/session/start`, { method: "POST" });
     const data = await res.json();
     state.reportId = data.report_id;
   } catch (err) {
@@ -230,37 +233,11 @@ async function uploadOne(category, shot) {
   const form = new FormData();
   form.append("report_id", state.reportId);
   form.append("image", shot.blob, "capture.jpg");
-  const res = await fetch(`/api/upload/${category}`, { method: "POST", body: form });
+  const res = await fetch(`${API_BASE_URL}/api/upload/${category}`, { method: "POST", body: form });
   if (!res.ok) {
     const data = await res.json().catch(() => ({}));
     throw new Error(data.error || `Upload failed for ${category} photo`);
   }
-}
-
-function renderAiVerdict(data) {
-  const banner = els["ai-verdict-banner"];
-  if (!banner || !data.verdict) return;
-
-  const isReal = data.verdict === "REAL";
-  banner.textContent = "";
-
-  const box = document.createElement("div");
-  box.className = `ai-verdict ${isReal ? "ai-verdict--real" : "ai-verdict--unverified"}`;
-
-  const heading = document.createElement("h3");
-  heading.className = "ai-verdict__title";
-  heading.textContent = isReal ? "Accident verified" : "Could not verify from photos";
-
-  const body = document.createElement("p");
-  body.className = "ai-verdict__body";
-  const confidence = typeof data.max_confidence === "number"
-    ? `${Math.round(data.max_confidence)}%`
-    : "n/a";
-  body.textContent = `Confidence: ${confidence}`;
-
-  box.appendChild(heading);
-  box.appendChild(body);
-  banner.appendChild(box);
 }
 
 async function sendReport() {
@@ -280,7 +257,7 @@ async function sendReport() {
   try {
     // 1. Location first
     if (state.location) {
-      await fetch("/api/location", {
+      await fetch(`${API_BASE_URL}/api/location`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -307,9 +284,8 @@ async function sendReport() {
     if (els["upload-progress-fill"]) els["upload-progress-fill"].style.width = "100%";
     if (els["upload-progress-label"]) els["upload-progress-label"].textContent = "Handing off to the response team…";
 
-    // 3. Finalize — backend forwards scene photos to the AI verification
-    //    service and returns an overall verdict + confidence.
-    const res = await fetch("/api/finalize", {
+    // 3. Finalize
+    const res = await fetch(`${API_BASE_URL}/api/finalize`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ report_id: state.reportId }),
@@ -317,8 +293,19 @@ async function sendReport() {
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || "Could not finalize the report");
 
-    if (els["case-id"]) els["case-id"].textContent = state.reportId;
-    renderAiVerdict(data);
+    els["case-id"].textContent = state.reportId;
+
+    const banner = document.getElementById("ai-verdict-banner");
+    if (banner && data.verdict) {
+      const isReal = data.verdict === "REAL";
+      banner.innerHTML = `
+        <div style="background: ${isReal ? '#1F8A5F' : '#E8420C'}; color: #fff; padding: 14px; border-radius: 6px; text-align: center;">
+          <h3 style="margin: 0; font-family: var(--font-display); font-size: 1.3rem;">
+            ${isReal ? '🚨 ACCIDENT VERIFIED (REAL)' : '⚠️ VERIFIED (FAKE ALERT)'}
+          </h3>
+          <p style="margin: 4px 0 0; font-size: 0.9rem;">Confidence: <strong>${data.max_confidence}%</strong></p>
+        </div>`;
+    }
 
     showScreen("screen-success");
   } catch (err) {
@@ -342,7 +329,6 @@ function resetState() {
     els["location-status"].textContent = "";
     els["location-status"].className = "location__status";
   }
-  if (els["ai-verdict-banner"]) els["ai-verdict-banner"].textContent = "";
 }
 
 // ------------------------------------------------------------------------ //
