@@ -1,0 +1,521 @@
+/* ==========================================================================
+   RapidAid — design tokens
+   ========================================================================== */
+
+:root {
+  /* Color */
+  --color-asphalt: #1B1E20;      /* dark chrome for camera + hero */
+  --color-asphalt-raised: #24282A;
+  --color-paper: #F3F2EE;        /* warm off-white surface */
+  --color-surface: #FFFFFF;
+  --color-alert: #E8420C;        /* hazard red-orange — primary action */
+  --color-alert-press: #C8380A;
+  --color-caution: #FFC93C;      /* hazard amber — progress / warnings */
+  --color-confirm: #1F8A5F;      /* muted safety green — success */
+  --color-ink: #1B1E20;
+  --color-ink-muted: #5B6168;
+  --color-ink-on-dark: #F3F2EE;
+  --color-ink-on-dark-muted: #A7ACAF;
+  --color-line: #E1DFD8;
+
+  /* Type */
+  --font-display: "Big Shoulders Display", "Arial Narrow", sans-serif;
+  --font-body: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+
+  /* Layout */
+  --radius-s: 4px;
+  --radius-m: 10px;
+  --content-max: 480px;
+  --tap-min: 52px;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+body {
+  font-family: var(--font-body);
+  color: var(--color-ink);
+  background: var(--color-paper);
+  -webkit-font-smoothing: antialiased;
+}
+
+button {
+  font-family: inherit;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+}
+
+/* ==========================================================================
+   Screens — simple show/hide SPA panels
+   ========================================================================== */
+
+.screen {
+  display: none;
+  min-height: 100dvh;
+  width: 100%;
+}
+
+.screen.is-active {
+  display: flex;
+  flex-direction: column;
+}
+
+.screen--dark {
+  background: var(--color-asphalt);
+  color: var(--color-ink-on-dark);
+}
+
+/* ==========================================================================
+   Buttons
+   ========================================================================== */
+
+.btn {
+  border: none;
+  border-radius: var(--radius-s);
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  min-height: var(--tap-min);
+  padding: 0 24px;
+  transition: transform 80ms ease, background-color 120ms ease;
+}
+.btn:active { transform: scale(0.98); }
+.btn:focus-visible {
+  outline: 3px solid var(--color-caution);
+  outline-offset: 2px;
+}
+
+.btn--primary {
+  background: var(--color-alert);
+  color: #fff;
+}
+.btn--primary:hover { background: var(--color-alert-press); }
+.btn--primary:disabled {
+  background: #C9C6BC;
+  color: #8B887E;
+  cursor: not-allowed;
+}
+
+.btn--xl {
+  width: 100%;
+  font-size: 1.1rem;
+  min-height: 60px;
+}
+
+.btn--text {
+  background: transparent;
+  color: var(--color-ink-muted);
+  width: 100%;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.btn--ghost-light {
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--color-ink-on-dark);
+  border-radius: 50%;
+  width: var(--tap-min);
+  height: var(--tap-min);
+  padding: 0;
+  font-size: 1.3rem;
+}
+
+/* ==========================================================================
+   Landing screen
+   ========================================================================== */
+
+.landing {
+  background: var(--color-asphalt);
+  color: var(--color-ink-on-dark);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 28px 24px 40px;
+  max-width: 640px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.landing__mark {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.3rem;
+  letter-spacing: 0.02em;
+  color: var(--color-caution);
+  margin-bottom: 48px;
+}
+
+.landing__headline {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(3rem, 12vw, 5rem);
+  line-height: 0.92;
+  letter-spacing: -0.01em;
+  margin: 0 0 20px;
+}
+
+.landing__sub {
+  font-size: 1.05rem;
+  line-height: 1.55;
+  color: var(--color-ink-on-dark-muted);
+  max-width: 46ch;
+  margin: 0 0 36px;
+}
+
+.btn#btn-start {
+  margin-bottom: 44px;
+}
+
+.steps {
+  list-style: none;
+  margin: 0 0 auto;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  border-top: 1px solid rgba(255, 255, 255, 0.14);
+  padding-top: 24px;
+}
+
+.steps__item {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+}
+
+.steps__num {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.15rem;
+  color: var(--color-alert);
+  width: 1.4em;
+}
+
+.steps__label {
+  font-size: 0.98rem;
+  color: var(--color-ink-on-dark);
+}
+
+.landing__footnote {
+  font-size: 0.85rem;
+  color: var(--color-ink-on-dark-muted);
+  margin-top: 32px;
+  line-height: 1.5;
+}
+
+/* ==========================================================================
+   Capture screen
+   ========================================================================== */
+
+.capture__header {
+  padding: 20px 24px 12px;
+  max-width: 640px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.capture__progress {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+.capture__progress-dot {
+  height: 4px;
+  flex: 1;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.18);
+}
+.capture__progress-dot.is-done { background: var(--color-caution); }
+.capture__progress-dot.is-current { background: var(--color-alert); }
+
+.capture__title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.8rem;
+  margin: 0 0 6px;
+}
+
+.capture__hint {
+  font-size: 0.95rem;
+  color: var(--color-ink-on-dark-muted);
+  margin: 0;
+  max-width: 52ch;
+}
+
+.viewfinder {
+  position: relative;
+  flex: 1;
+  min-height: 280px;
+  background: #000;
+  margin: 8px 0;
+  overflow: hidden;
+}
+
+.viewfinder__video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.viewfinder__overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  background: rgba(27, 30, 32, 0.85);
+  text-align: center;
+  padding: 24px;
+  z-index: 10;
+}
+
+.viewfinder__overlay[hidden] {
+  display: none !important;
+}
+
+.filmstrip {
+  display: flex;
+  gap: 8px;
+  padding: 10px 24px;
+  overflow-x: auto;
+  max-width: 640px;
+  width: 100%;
+  margin: 0 auto;
+  min-height: 76px;
+}
+
+.filmstrip__thumb {
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-s);
+  object-fit: cover;
+  flex-shrink: 0;
+  border: 2px solid var(--color-caution);
+}
+
+.capture__controls {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 24px 28px;
+  max-width: 640px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.capture__controls .btn--ghost-light {
+  justify-self: start;
+}
+
+.capture__controls .btn--primary {
+  grid-column: 3;
+  justify-self: end;
+  width: auto;
+  padding: 0 18px;
+  min-height: var(--tap-min);
+  font-size: 0.95rem;
+  white-space: nowrap;
+}
+
+.shutter {
+  grid-column: 2;
+  justify-self: center;
+  width: 68px;
+  height: 68px;
+  border-radius: 50%;
+  background: #fff;
+  border: 4px solid var(--color-alert);
+  cursor: pointer;
+}
+.shutter:active { transform: scale(0.94); }
+
+/* ==========================================================================
+   Panel screens (location / review / success)
+   ========================================================================== */
+
+.panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 32px 24px 48px;
+  max-width: var(--content-max);
+  margin: 0 auto;
+  width: 100%;
+  text-align: left;
+}
+
+.panel--wide {
+  max-width: 560px;
+  justify-content: flex-start;
+  padding-top: 48px;
+}
+
+.panel__icon {
+  margin-bottom: 20px;
+}
+
+.panel__title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 2rem;
+  margin: 0 0 12px;
+}
+
+.panel__body {
+  font-size: 1rem;
+  line-height: 1.55;
+  color: var(--color-ink-muted);
+  margin: 0 0 28px;
+}
+
+.location__status {
+  font-size: 0.92rem;
+  color: var(--color-ink-muted);
+  min-height: 1.4em;
+  margin-bottom: 12px;
+}
+.location__status.is-error { color: var(--color-alert); }
+.location__status.is-ok { color: var(--color-confirm); }
+
+/* Summary list on review screen */
+
+.summary {
+  margin: 0 0 28px;
+  border-top: 1px solid var(--color-line);
+}
+
+.summary__row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--color-line);
+}
+
+.summary__row dt {
+  font-size: 0.98rem;
+  color: var(--color-ink-muted);
+}
+
+.summary__row dd {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.3rem;
+}
+
+.upload-progress {
+  margin-bottom: 20px;
+}
+
+.upload-progress__bar {
+  height: 8px;
+  border-radius: 4px;
+  background: var(--color-line);
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.upload-progress__fill {
+  height: 100%;
+  width: 0%;
+  background: var(--color-alert);
+  transition: width 200ms ease;
+}
+
+.upload-progress__label {
+  font-size: 0.88rem;
+  color: var(--color-ink-muted);
+  margin: 0;
+}
+
+.panel__icon--success {
+  animation: pop 320ms ease;
+}
+@keyframes pop {
+  0% { transform: scale(0.7); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* ==========================================================================
+   AI verdict banner (success screen)
+   ========================================================================== */
+
+.ai-verdict {
+  padding: 14px 16px;
+  border-radius: var(--radius-m);
+  text-align: center;
+  color: #fff;
+}
+.ai-verdict--real { background: var(--color-confirm); }
+.ai-verdict--unverified { background: var(--color-alert); }
+
+.ai-verdict__title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.2rem;
+}
+
+.ai-verdict__body {
+  margin: 4px 0 0;
+  font-size: 0.9rem;
+}
+
+/* ==========================================================================
+   Toast
+   ========================================================================== */
+
+.toast {
+  position: fixed;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-140%);
+  background: var(--color-ink);
+  color: #fff;
+  padding: 12px 20px;
+  border-radius: var(--radius-s);
+  font-size: 0.9rem;
+  z-index: 100;
+  transition: transform 200ms ease;
+  max-width: 90vw;
+  text-align: center;
+}
+.toast.is-visible {
+  transform: translateX(-50%) translateY(0);
+}
+
+/* ==========================================================================
+   Desktop / wider viewports
+   ========================================================================== */
+
+@media (min-width: 860px) {
+  .landing {
+    padding: 64px 24px 80px;
+    max-width: 640px;
+  }
+
+  .viewfinder {
+    border-radius: var(--radius-m);
+    max-width: 640px;
+    margin: 8px auto;
+    width: 100%;
+    height: 60vh;
+  }
+
+  .panel, .panel--wide {
+    padding-top: 72px;
+  }
+}
