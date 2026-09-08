@@ -6,7 +6,7 @@
  */
 
 // Define your backend server URL here (e.g., your Render HTTPS URL or Ngrok tunnel)
-const API_BASE_URL = "https://resqser.onrender.com/";
+const API_BASE_URL = "https://resqser.onrender.com";
 
 const state = {
   reportId: null,
